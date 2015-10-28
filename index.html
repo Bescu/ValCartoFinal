@@ -168,6 +168,10 @@ function initialize() {
 	
 	function clic(event){
 	
+		// si une fenêtre d'information est déjà ouverte ou un marqueur animé on les ferme
+		
+		resetInfAni();
+	
 		// construction du code HTML à insérer dans la fenêtre d'information
 		
 		htmlInfo = '<div class="infoWindow">'
@@ -193,6 +197,31 @@ function initialize() {
 
 		infoWindow = new google.maps.InfoWindow({ content: htmlInfo, position: event.latLng, pixelOffset: {width:0, height:-40}});
 		infoWindow.open(map);
+		infoWindow.addListener("closeclick",resetInfAni);
+		
+		// animation de l'icone
+		
+		latFeat = event.latLng.lat();
+		lngFeat = event.latLng.lng();
+		featureAnim = event.feature;
+		featureAnim.setGeometry(0,0); // je déplace le feature pour qu'il ne soit plus visible sur la carte
+		marker = new google.maps.Marker({position:{lat:latFeat,lng:lngFeat},map:map,icon:{url: layers[featureAnim.getProperty("type")][1], scaledSize: layers[feature.getProperty('type')][3], anchor: layers[feature.getProperty('type')][5]},animation: google.maps.Animation.BOUNCE}); // je créé un marker animé qui le remplace
+	};
+	
+	function resetInfAni(){
+	
+		// si une fenêtre d'information est déjà ouverte, on la ferme
+		
+		if (typeof infoWindow != 'undefined') {
+			infoWindow.close();
+		};
+		
+		// s'il y a encore un marker animé, le supprimer et remettre le feature d'origine
+		
+		if (typeof marker != 'undefined' && marker.getMap() != 'null') {
+			featureAnim.setGeometry({lat:latFeat,lng:lngFeat});
+			marker.setMap(null);
+		};
 	};
 	
 	dicoProperty = {
