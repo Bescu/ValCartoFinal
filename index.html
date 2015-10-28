@@ -151,7 +151,9 @@ function initialize() {
 		var htmlInfo = '<div class="infoWindow">'
 		feature = event.feature;
 		feature.forEachProperty(function(value,property) {
-			htmlInfo = htmlInfo + '<li>' + property + ' : ' + value + '</li>\n';
+			if (property != 'id' && value != null){
+				htmlInfo = htmlInfo + '<li><b>' + property + ' : </b>' + value + '</li>\n';
+			}
 		});
 		htmlInfo = htmlInfo + '</div>';
 		
