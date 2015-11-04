@@ -334,7 +334,13 @@ function initialize() {
 		lngFeat = event.latLng.lng();
 		featureAnim = event.feature;
 		featureAnim.setGeometry(0,0); // je déplace le feature pour qu'il ne soit plus visible sur la carte
-		marker = new google.maps.Marker({position:{lat:latFeat,lng:lngFeat},map:map,icon:{url: layers[featureAnim.getProperty("type")][1], scaledSize: layers[feature.getProperty('type')][3], anchor: layers[feature.getProperty('type')][5]},animation: google.maps.Animation.BOUNCE}); // je créé un marker animé qui le remplace
+		if (map.getZoom()<15){
+			pictoSize = new google.maps.Size((layers[featureAnim.getProperty('type')][3].width)*0.7,(layers[featureAnim.getProperty('type')][3].height)*0.7);
+			pictoAnchor = new google.maps.Point((layers[featureAnim.getProperty('type')][5].x)*0.7,(layers[featureAnim.getProperty('type')][5].y)*0.7)
+			marker = new google.maps.Marker({position:{lat:latFeat,lng:lngFeat},map:map,icon:{url: layers[featureAnim.getProperty("type")][1], scaledSize: pictoSize, anchor: pictoAnchor},animation: google.maps.Animation.BOUNCE}); // je créé un marker animé qui le remplace
+		} else {
+			marker = new google.maps.Marker({position:{lat:latFeat,lng:lngFeat},map:map,icon:{url: layers[featureAnim.getProperty("type")][1], scaledSize: layers[feature.getProperty('type')][3], anchor: layers[feature.getProperty('type')][5]},animation: google.maps.Animation.BOUNCE}); // je créé un marker animé qui le remplace
+		};
 	};
 	
 	function resetInfAni(){
@@ -398,6 +404,30 @@ function initialize() {
 			copyrightDiv.innerHTML = 'Photo aérienne (2012) : © <a href="http://www.ppige-npdc.fr/portail/" target="blank">PPige</a>';
 		} else if (newMapType == 'Plan MapQuest'){
 			copyrightDiv.innerHTML = 'Rendu cartographique : © <a href="http://www.mapquest.com/" target="blank">MapQuest</a>, Données : © Les contributeurs d\'<a href="http://www.openstreetmap.org" target="blank">OpenStreetMap</a>';
+		};
+	};
+	
+	// Change le taille des pictos en dessous de 15
+	
+	google.maps.event.addListener(map, "zoom_changed", onZoomChanged);
+	onZoomChanged();
+	
+	function onZoomChanged(){
+		for (index in layers){
+			layers[index][0].setStyle(function(feature){ // fonction pour retourner en titre le Libellé du feature voir ce sujet : http://stackoverflow.com/questions/25787502/add-tooltip-on-a-data-feature-object-like-we-can-do-for-the-marker/25792796#25792796
+				if (map.getZoom()<15){
+					pictoSize = new google.maps.Size((layers[feature.getProperty('type')][3].width)*0.7,(layers[feature.getProperty('type')][3].height)*0.7);
+					pictoAnchor = new google.maps.Point((layers[feature.getProperty('type')][5].x)*0.7,(layers[feature.getProperty('type')][5].y)*0.7);
+				} else {
+					pictoSize = layers[feature.getProperty('type')][3];
+					pictoAnchor = layers[feature.getProperty('type')][5];
+				};
+				return {
+					title: feature.getProperty('nom')||null, // défini le titre en fonction de son Libellé
+					icon: {url: layers[feature.getProperty('type')][1], scaledSize: pictoSize, anchor: pictoAnchor}, // défini l'icone de chaque couche en fonction de son genre
+					zIndex: layers[feature.getProperty('type')][4]
+				};
+			});
 		};
 	};
 };
