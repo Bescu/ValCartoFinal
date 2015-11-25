@@ -1,0 +1,401 @@
+﻿<!DOCTYPE  html>
+<html>
+<head>
+<title>ValCarto Beta</title>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<style type="text/css">
+html {
+height: 100%;
+}
+
+body {
+height: 100%;
+margin: 0px;
+padding: 0px;
+}
+
+#map_canvas {
+position: absolute;
+top: 0px;
+bottom: 0px;
+width: 100%;
+}
+
+.infoWindow {
+width: 400px;
+}
+
+.infoWindow * {
+margin: 2px;
+}
+
+.type {
+font-size: 10px;
+margin-bottom: 3px;
+font-style: italic;
+}
+
+.nomProperty {
+text-align: center;
+width: 100px;
+font-weight: bold;
+}
+
+.siteweb {
+text-align: center;
+}
+
+tr {
+font-size: 12px;
+}
+
+td {
+padding-top: 7px;
+}
+
+.photoInf{
+padding: 10px;
+max-height: 233px;
+width: auto;
+}
+
+#logo {
+position: absolute;
+right: 5px;
+bottom: 20px;
+z-index: 1;
+width: 150px;
+}
+
+a img {
+border: 0;
+}
+
+#mapCopyright {
+font-size: 10px;
+font-family: Arial, sans-serif;
+margin: 0.1;
+padding: 1px 3px 1px 3px;
+white-space: nowrap;
+background-color: white;
+opacity: 0.6;
+}
+
+#blocLegende {
+background-color: white;
+opacity: 0.8;
+position: absolute;
+left: 20px;
+top: 20px;
+min-width: 150px;
+max-width: 350px;
+z-index: 1;
+border-radius:16px;
+padding-right:10px;
+padding-left:10px;
+padding-bottom:10px;
+}
+
+.imgLegend{
+width: 25px;
+padding-top: 3px;
+padding-right: 5px;
+vertical-align:middle;
+cursor:pointer;
+}
+
+#blocLegende h1 { 
+font-size: 20px;
+text-align: center;
+margin-bottom: 20px;
+}
+</style>
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false" ></script>
+<script type="text/javascript">
+
+function initialize() {
+
+	// import de la carte MapQuest
+	
+	mapQuestType = new google.maps.ImageMapType({
+		getTileUrl: function(coord, zoom) {
+			return "http://otile1.mqcdn.com/tiles/1.0.0/map/" +
+			zoom + "/" + coord.x + "/" + coord.y + ".png";
+		},
+		tileSize: new google.maps.Size(256, 256),
+		isPng: true,
+		alt: "MapQuest layer (données OSM)",
+		name: "Plan MapQuest",
+		maxZoom: 20
+	});
+	
+	// import du raster PPige
+	
+	ppige2012Type = new google.maps.ImageMapType({
+		getTileUrl: function (coord, zoom) {
+			var proj = map.getProjection();
+			var zfactor = Math.pow(2, zoom);
+			// get Long Lat coordinates
+			var top = proj.fromPointToLatLng(new google.maps.Point(coord.x * 256 / zfactor, coord.y * 256 / zfactor));
+			var bot = proj.fromPointToLatLng(new google.maps.Point((coord.x + 1) * 256 / zfactor, (coord.y + 1) * 256 / zfactor));
+
+			//create the Bounding box string
+			var bbox =     (top.lng()) + "," +
+						   (bot.lat()) + "," +
+						   (bot.lng()) + "," +
+						   (top.lat());
+
+			//base WMS URL
+			var url = "http://www.ppige-npdc.fr/cgi-bin/mapserv?map=/var/www/mapcache/map/ortho2013.map&";
+			url += "&REQUEST=GetMap"; //WMS operation
+			url += "&SERVICE=WMS";    //WMS service
+			url += "&VERSION=1.1.1";  //WMS version  
+			url += "&LAYERS=orthoRGB_20cm_2013"; //WMS layers
+			url += "&FORMAT=image/png" ; //WMS format
+			url += "&BGCOLOR=0xFFFFFF";  
+			url += "&TRANSPARENT=TRUE";
+			url += "&SRS=EPSG:4326";     //set WGS84 
+			url += "&BBOX=" + bbox;      // set bounding box
+			url += "&WIDTH=256";         //tile size in google
+			url += "&HEIGHT=256";
+			return url;                 // return URL for the tile
+
+		},
+		tileSize: new google.maps.Size(256, 256),
+		isPng: true,
+		alt: "Photo aérienne PPige 2012",
+		name: "Photo aérienne PPige",
+		maxZoom: 20
+	});
+	
+	// options et affichage de la carte
+	
+	var latlng= new google.maps.LatLng(50.361, 3.52);
+	var myOptions = {
+		zoom: 14,
+		minZoom: 13,
+		maxZoom: 18,
+		center: latlng,
+		disableDefaultUI: true,
+		mapTypeControl: true,
+		mapTypeControlOptions: {mapTypeIds: ['Plan MapQuest','Photo aérienne PPige'],style: google.maps.MapTypeControlStyle.DROPDOWN_MENU, position: google.maps.ControlPosition.RIGHT_TOP},
+		streetViewControl: true,
+		streetViewControlOptions: {position: google.maps.ControlPosition.RIGHT_TOP},
+		scaleControl: true,
+		zoomControl: true,
+		zoomControlOptions: {position: google.maps.ControlPosition.RIGHT_TOP},
+		mapTypeId: 'Plan MapQuest'
+	};
+	map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+	map.mapTypes.set('Photo aérienne PPige',ppige2012Type);
+	map.mapTypes.set('Plan MapQuest',mapQuestType);
+	map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(document.getElementById("mapCopyright"));
+	
+	// import du masque des communes voisines
+	
+	dataCom = new google.maps.Data();
+	dataCom.loadGeoJson('com.geojson');
+	dataCom.setStyle({fillOpacity:0.6,strokeWeight:0,clickable:false});
+	dataCom.setMap(map);
+	
+	// import des données GeoJson
+	
+	dataCompl = new google.maps.Data();
+	dataCompl.addListener('addfeature',splitData);
+	dataCompl.loadGeoJson('creches.geojson');
+	dataCompl.loadGeoJson('ecoles.geojson');
+	
+	// fonction splitData à l'import des données pour répartir selon leurs types, icones, etc...
+	
+	function splitData(AddFeatureEvent){
+		var feature = AddFeatureEvent.feature;
+		var type = feature.getProperty("type");
+		var layer_index = (!layers[type] || layers[type]===undefined) ? "problems" : type;
+		layers[layer_index][0].add(feature);
+	};
+	
+	// Création des couches thématiques dans un objet contenant plusieurs array : [0] = création de l'objet Data ; [1] = lien logo ; [2] = Nom à afficher dans la légende ; [3] = sizeIcon ; [4] = zindex ; [5] = anchor ; [6] = thème
+	
+	layers = {
+		creche : [ new google.maps.Data(), "pictos/creche.png" , "Crèche" , new google.maps.Size(40,38) , 2 , new google.maps.Point(15,37) , "education"],
+		ejf : [ new google.maps.Data(), "pictos/ejf.png" , "Espace Jeunesse Famille" , new google.maps.Size(40,38) , 2 , new google.maps.Point(15,37) , "education"],
+		mat : [ new google.maps.Data(), "pictos/mat.png" , "Maternelle publique" , new google.maps.Size(40,38) , 2 , new google.maps.Point(15,37) , "education"],
+		mat_pri : [ new google.maps.Data(), "pictos/mat_pri.png" , "Maternelle et primaire publiques" , new google.maps.Size(72,37) , 2 , new google.maps.Point(32,36) , "education"],
+		mat_pri_col_p : [ new google.maps.Data(), "pictos/mat_pri_col.png" , "Maternelle, primaire et collège privés" , new google.maps.Size(73,65) , 2 , new google.maps.Point(32,64) , "education"],
+		mat_pri_p : [ new google.maps.Data(), "pictos/mat_pri.png" , "Maternelle et primaire privées" , new google.maps.Size(72,37) , 2 , new google.maps.Point(32,36) , "education"],
+		pri : [ new google.maps.Data(), "pictos/pri.png" , "Primaire publique" , new google.maps.Size(40,38) , 2 , new google.maps.Point(15,37) , "education"],
+		col : [ new google.maps.Data(), "pictos/col.png" , "Collège public" , new google.maps.Size(40,38) , 2 , new google.maps.Point(15,37) , "education"],
+		col_p : [ new google.maps.Data(), "pictos/col.png" , "Collège privé" , new google.maps.Size(40,38) , 2 , new google.maps.Point(15,37) , "education"],
+		lyc : [ new google.maps.Data(), "pictos/lyc.png" , "Lycée public" , new google.maps.Size(40,38) , 2 , new google.maps.Point(15,37) , "education"],
+		lyc_p : [ new google.maps.Data(), "pictos/lyc.png" , "Lycée privé" , new google.maps.Size(40,38) , 2 , new google.maps.Point(15,37) , "education"],
+		problems : [ new google.maps.Data(), "" , "" , new google.maps.Size(40,38) , 2 , new google.maps.Point(15,37) , ""]
+	};
+	
+	// Ajout des couches et paramètrage de leur style
+	
+	for (index in layers){
+		layers[index][0].setMap(map); // affichage des couches sur la carte
+		layers[index][0].setStyle(function(feature){ // fonction pour retourner en titre le Libellé du feature voir ce sujet : http://stackoverflow.com/questions/25787502/add-tooltip-on-a-data-feature-object-like-we-can-do-for-the-marker/25792796#25792796
+			return {
+				title: feature.getProperty('nom')||null, // défini le titre en fonction de son Libellé
+				icon: {url: layers[feature.getProperty('type')][1], scaledSize: layers[feature.getProperty('type')][3], anchor: layers[feature.getProperty('type')][5]}, // défini l'icone de chaque couche en fonction de son genre
+				zIndex: layers[feature.getProperty('type')][4]
+			};
+		});
+		layers[index][0].addListener('click',clic); // ajout d'un événement clic sur les entités
+	};
+	
+	// fonction quand on clique sur une entité
+	
+	function clic(event){
+	
+		// si une fenêtre d'information est déjà ouverte ou un marqueur animé on les ferme
+		
+		resetInfAni();
+	
+		// construction du code HTML à insérer dans la fenêtre d'information
+		
+		htmlInfo = '<div class="infoWindow">'
+		feature = event.feature;
+		htmlInfo = htmlInfo + '<h3 class="nomInfobulle">' + feature.getProperty('nom') + '</h3>';
+		htmlInfo = htmlInfo + '<p class="type">' + layers[event.feature.getProperty('type')][2] + '</p><hr><table class="tableInfos>"'
+		feature.forEachProperty(function(value,property) {
+			if (property != 'id' && property != 'nom' && property != 'type' && property != 'siteweb' && property != 'photo' && value != null){
+				if (dicoProperty[property]){
+					htmlInfo = htmlInfo + '<tr class="ligneTabInf"><td class="nomProperty">' + dicoProperty[property][0] + '</td><td>' + String(value).replace(" | ","<br>").replace(" | ","<br>").replace(" | ","<br>").replace(" | ","<br>").replace(" | ","<br>") + '</td></tr>';
+				} else {
+					htmlInfo = htmlInfo + '<tr class="ligneTabInf"><td class="nomProperty">' + property + '</td><td>' + String(value).replace(" | ","<br>").replace(" | ","<br>").replace(" | ","<br>").replace(" | ","<br>").replace(" | ","<br>") + '</td></tr>';
+				};
+			};
+		});
+		htmlInfo = htmlInfo + '</table>';
+		if (feature.getProperty('siteweb') && feature.getProperty('siteweb') != null){
+			htmlInfo = htmlInfo + '<p class="siteweb"><a href="' + feature.getProperty('siteweb') + '" target="_blank">Accéder au site internet</a>';
+		};
+		if (feature.getProperty('photo') && feature.getProperty('photo') != null){
+			htmlInfo = htmlInfo + '<img class="photoInf" src="img/' + feature.getProperty('photo') + '"/>';
+		};
+		htmlInfo = htmlInfo + '</div>';
+		
+		// création et ouverture de la fenêtre d'information
+
+		infoWindow = new google.maps.InfoWindow({ content: htmlInfo, position: event.latLng, pixelOffset: {width:0, height:-40}});
+		infoWindow.open(map);
+		infoWindow.addListener("closeclick",resetInfAni);
+		
+		// animation de l'icone
+		
+		latFeat = event.latLng.lat();
+		lngFeat = event.latLng.lng();
+		featureAnim = event.feature;
+		featureAnim.setGeometry(0,0); // je déplace le feature pour qu'il ne soit plus visible sur la carte
+		if (map.getZoom()<15){
+			pictoSize = new google.maps.Size((layers[featureAnim.getProperty('type')][3].width)*0.7,(layers[featureAnim.getProperty('type')][3].height)*0.7);
+			pictoAnchor = new google.maps.Point((layers[featureAnim.getProperty('type')][5].x)*0.7,(layers[featureAnim.getProperty('type')][5].y)*0.7)
+			marker = new google.maps.Marker({position:{lat:latFeat,lng:lngFeat},map:map,icon:{url: layers[featureAnim.getProperty("type")][1], scaledSize: pictoSize, anchor: pictoAnchor},animation: google.maps.Animation.BOUNCE}); // je créé un marker animé qui le remplace
+		} else {
+			marker = new google.maps.Marker({position:{lat:latFeat,lng:lngFeat},map:map,icon:{url: layers[featureAnim.getProperty("type")][1], scaledSize: layers[feature.getProperty('type')][3], anchor: layers[feature.getProperty('type')][5]},animation: google.maps.Animation.BOUNCE}); // je créé un marker animé qui le remplace
+		};
+	};
+	
+	function resetInfAni(){
+	
+		// si une fenêtre d'information est déjà ouverte, on la ferme
+		
+		if (typeof infoWindow != 'undefined') {
+			infoWindow.close();
+		};
+		
+		// s'il y a encore un marker animé, le supprimer et remettre le feature d'origine
+		
+		if (typeof marker != 'undefined' && marker.getMap() != 'null') {
+			featureAnim.setGeometry({lat:latFeat,lng:lngFeat});
+			marker.setMap(null);
+		};
+	};
+	
+	dicoProperty = {
+		Tel : ["Téléphone"],
+		Annee : ["Année"],
+		Comment : ["Remarque"],
+		Materiaux : ["Matériaux"],
+		Activites : ["Activités"],
+		TypAcc : ["Type d'accueil"],
+		Age : ["Âge"],
+		Public : ["Type d'établissement"]		
+	};
+		
+	function legClic(event){
+		var id = event.target.id;
+		var elem = document.getElementById(id);
+		for (index in layers){
+			if (layers[index][6] == id) {
+				if (layers[index][0].map){
+					resetInfAni();
+					layers[index][0].setMap();
+					elem.className = 'boutonsCouchesOff';
+				} else {
+					layers[index][0].setMap(map);
+					elem.className = 'boutonsCouches';
+				};
+			};
+		};
+	};
+	
+	// Gestion des copyright
+	
+	google.maps.event.addListener(map, "maptypeid_changed", onMapTypeIdChanged);
+	onMapTypeIdChanged();
+	
+	function onMapTypeIdChanged(event){
+		newMapType = map.getMapTypeId();
+		copyrightDiv = document.getElementById("mapCopyright");
+		if (newMapType == 'Photo aérienne PPige'){
+			copyrightDiv.innerHTML = 'Photo aérienne (2012) : © <a href="http://www.ppige-npdc.fr/portail/" target="blank">PPige</a>';
+		} else if (newMapType == 'Plan MapQuest'){
+			copyrightDiv.innerHTML = 'Rendu cartographique : © <a href="http://www.mapquest.com/" target="blank">MapQuest</a>, Données : © Les contributeurs d\'<a href="http://www.openstreetmap.org" target="blank">OpenStreetMap</a>';
+		};
+	};
+	
+	// Change le taille des pictos en dessous de 15
+	
+	google.maps.event.addListener(map, "zoom_changed", onZoomChanged);
+	onZoomChanged();
+	
+	function onZoomChanged(){
+		for (index in layers){
+			layers[index][0].setStyle(function(feature){ // fonction pour retourner en titre le Libellé du feature voir ce sujet : http://stackoverflow.com/questions/25787502/add-tooltip-on-a-data-feature-object-like-we-can-do-for-the-marker/25792796#25792796
+				if (map.getZoom()<15){
+					pictoSize = new google.maps.Size((layers[feature.getProperty('type')][3].width)*0.7,(layers[feature.getProperty('type')][3].height)*0.7);
+					pictoAnchor = new google.maps.Point((layers[feature.getProperty('type')][5].x)*0.7,(layers[feature.getProperty('type')][5].y)*0.7);
+				} else {
+					pictoSize = layers[feature.getProperty('type')][3];
+					pictoAnchor = layers[feature.getProperty('type')][5];
+				};
+				return {
+					title: feature.getProperty('nom')||null, // défini le titre en fonction de son Libellé
+					icon: {url: layers[feature.getProperty('type')][1], scaledSize: pictoSize, anchor: pictoAnchor}, // défini l'icone de chaque couche en fonction de son genre
+					zIndex: layers[feature.getProperty('type')][4]
+				};
+			});
+		};
+	};
+};
+</script>
+</head>
+<body onload="initialize()">
+<div id="map_canvas"></div>
+<div id="blocLegende">
+	<h1>Légende</h1>
+	<img class="imgLegend" src="pictos/creche.png" name="creche">Crèches<BR>
+	<img class="imgLegend" src="pictos/ejf.png" name="ejf">Espace Jeunesse Famille<BR>
+	<img class="imgLegend" src="pictos/mat.png" name="mat">Maternelles<BR>
+	<img class="imgLegend" src="pictos/pri.png" name="pri">Primaires<BR>
+	<img class="imgLegend" src="pictos/col.png" name="col">Collèges<BR>
+	<img class="imgLegend" src="pictos/lyc.png" name="lyc">Lycées<BR>
+</div>
+<div id="mapCopyright"></div>
+<a href="http://www.valenciennes.fr/" target="blank"><img id="logo" src="logo.png"></a>
+</body>
+</html>
