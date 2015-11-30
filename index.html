@@ -58,7 +58,7 @@ color: white;
 outline: 0;
 border: 0;
 margin-top: 7.5px;
-opacity: 0.5;
+opacity: 0.3;
 }
 
 #education{
@@ -83,6 +83,27 @@ width: 400px;
 
 .infoWindow * {
 margin: 2px;
+padding: 1px;
+}
+
+.nomInfobulle {
+font-weight: 400;
+font-size: 15px;
+font-family: Roboto,Arial,sans-serif;
+}
+
+.csc-default table {
+margin: 2px;
+padding: 1px;
+}
+
+.csc-default table td {
+padding: 0;
+background-color: rgb(255,255,255);
+}
+
+hr {
+border-top-color: darkgray;
 }
 
 .type {
@@ -101,12 +122,18 @@ font-weight: bold;
 text-align: center;
 }
 
-tr {
+.ligneTabInf {
 font-size: 12px;
 }
 
-td {
+.tableInfos {
+border-spacing: 0;
+}
+
+.tableInfos td {
+padding: 0;
 padding-top: 7px;
+background-color: rgb(255,255,255);
 }
 
 .photoInf{
@@ -303,7 +330,7 @@ layers = {
 		htmlInfo = '<div class="infoWindow">'
 		feature = event.feature;
 		htmlInfo = htmlInfo + '<h3 class="nomInfobulle">' + feature.getProperty('nom') + '</h3>';
-		htmlInfo = htmlInfo + '<p class="type">' + layers[event.feature.getProperty('type')][2] + '</p><hr><table class="tableInfos>"'
+		htmlInfo = htmlInfo + '<p class="type">' + layers[event.feature.getProperty('type')][2] + '</p><hr><table class="tableInfos">'
 		feature.forEachProperty(function(value,property) {
 			if (property != 'id' && property != 'nom' && property != 'type' && property != 'siteweb' && property != 'photo' && value != null){
 				if (dicoProperty[property]){
