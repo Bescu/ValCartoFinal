@@ -362,7 +362,7 @@ layers = {
 		// création et ouverture de la fenêtre d'information
 
 		infoWindow = new google.maps.InfoWindow({ content: htmlInfo, position: event.latLng, pixelOffset: {width:0, height:-40}});
-		setTimeout(function(){infoWindow.open(map)},50);
+		setTimeout(function(){infoWindow.open(map)},200);
 		infoWindow.addListener("closeclick",resetInfAni);
 		
 		// animation de l'icone
