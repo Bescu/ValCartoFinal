@@ -273,6 +273,14 @@ function initialize() {
 		var type = feature.getProperty("type");
 		var layer_index = (!layers[type] || layers[type]===undefined) ? "problems" : type;
 		layers[layer_index][0].add(feature);
+		
+		// préchargement de l'image si elle existe:
+		
+		if (feature.getProperty('photo')){
+			var img=new Image();
+			img.src='img/' + feature.getProperty('photo');
+			console.log(feature.getProperty('photo') + " préchargée");
+		};
 	};
 	
 	// Création des couches thématiques dans un objet contenant plusieurs array : [0] = création de l'objet Data ; [1] = lien logo ; [2] = Nom à afficher dans la légende ; [3] = sizeIcon ; [4] = zindex ; [5] = anchor ; [6] = thème
