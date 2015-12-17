@@ -166,6 +166,39 @@ white-space: nowrap;
 background-color: white;
 opacity: 0.6;
 }
+
+#legende {
+background-color: black;
+color: white;
+opacity: 0.8;
+position: absolute;
+right: 10px;
+top: 396.5px;
+z-index: 1;
+border-radius:16px;
+padding-right:10px;
+padding-left:0px;
+margin-left:0px;
+vertical-align: middle;
+}
+
+#listeLegende {
+list-style-type:none;
+padding-left:15px;
+margin-left:0px;
+}
+
+.imgLegende {
+height : 24px;
+vertical-align: middle;
+padding-top:3px;
+padding-bottom:3px;
+}
+
+.ligneLegende {
+font-size: 0.9em;
+font-family: "Open Sans",Verdana,sans-serif;
+}
 </style>
 <script type="text/javascript" src="http://maps.google.com/maps/api/js" ></script>
 <script type="text/javascript">
@@ -295,15 +328,15 @@ layers = {
 		equip_sportifs : [ new google.maps.Data(), "pictos/punaiseFushia.png" , "Équipement sportif" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "sport", new google.maps.Size(32,39)],
 		creche : [ new google.maps.Data(), "pictos/punaiseBleu.png" , "Crèche" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
 		ejf : [ new google.maps.Data(), "pictos/punaiseBleu.png" , "Espace Jeunesse Famille" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
-		mat : [ new google.maps.Data(), "pictos/punaiseBleu.png" , "Maternelle publique" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
-		mat_pri : [ new google.maps.Data(), "pictos/punaiseBleu.png" , "Maternelle et primaire publiques" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
-		mat_pri_col_p : [ new google.maps.Data(), "pictos/punaiseBleu.png" , "Maternelle, primaire et collège privés" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
-		mat_pri_p : [ new google.maps.Data(), "pictos/punaiseBleu.png" , "Maternelle et primaire privées" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
-		pri : [ new google.maps.Data(), "pictos/punaiseBleu.png" , "Primaire publique" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
-		col : [ new google.maps.Data(), "pictos/punaiseBleu.png" , "Collège public" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
-		col_p : [ new google.maps.Data(), "pictos/punaiseBleu.png" , "Collège privé" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
-		lyc : [ new google.maps.Data(), "pictos/punaiseBleu.png" , "Lycée public" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
-		lyc_p : [ new google.maps.Data(), "pictos/punaiseBleu.png" , "Lycée privé" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
+		mat : [ new google.maps.Data(), "pictos/punaiseBleu2.png" , "Maternelle publique" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
+		mat_pri : [ new google.maps.Data(), "pictos/punaiseBleu2.png" , "Maternelle et primaire publiques" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
+		mat_pri_col_p : [ new google.maps.Data(), "pictos/punaiseBleu2.png" , "Maternelle, primaire et collège privés" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
+		mat_pri_p : [ new google.maps.Data(), "pictos/punaiseBleu2.png" , "Maternelle et primaire privées" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
+		pri : [ new google.maps.Data(), "pictos/punaiseBleu2.png" , "Primaire publique" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
+		col : [ new google.maps.Data(), "pictos/punaiseBleu2.png" , "Collège public" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
+		col_p : [ new google.maps.Data(), "pictos/punaiseBleu2.png" , "Collège privé" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
+		lyc : [ new google.maps.Data(), "pictos/punaiseBleu2.png" , "Lycée public" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
+		lyc_p : [ new google.maps.Data(), "pictos/punaiseBleu2.png" , "Lycée privé" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "education", new google.maps.Size(32,39)],
 		mairie : [ new google.maps.Data(), "pictos/punaiseMoutarde.png" , "Mairie" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "servicesPublics", new google.maps.Size(32,39)],
 		caf : [ new google.maps.Data(), "pictos/punaiseMoutarde.png" , "Caisse d'Allocations Familiales" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "servicesPublics", new google.maps.Size(32,39)],
 		cpam : [ new google.maps.Data(), "pictos/punaiseMoutarde.png" , "Caisse Primaire d'Assurance Maladie" , new google.maps.Size(32,39) , 2 , new google.maps.Point(8,36) , "servicesPublics", new google.maps.Size(32,39)],
@@ -472,6 +505,12 @@ layers = {
 			});
 		};
 	};
+	
+	// alignement vertical de la légende
+	
+	topPosition = window.innerHeight/2-105;
+	document.getElementById("legende").style.posTop=topPosition; 
+	
 };
 </script>
 </head>
@@ -481,7 +520,17 @@ layers = {
 	<button class="boutonsCouches" id="sport">EQUIPEMENTS SPORTIFS</button>
 	<button class="boutonsCouches" id="art">ART</button>
 	<button class="boutonsCouches" id="servicesPublics">SERVICES PUBLICS</button>
-</div>	
+</div>
+<div id="legende">
+	<ul id="listeLegende">
+		<li class="ligneLegende"><img class="imgLegende" src="pictos/punaiseBleu.png"/>Crèche</li>
+		<li class="ligneLegende"><img class="imgLegende" src="pictos/punaiseBleu2.png"/>École</li>
+		<li class="ligneLegende"><img class="imgLegende" src="pictos/punaiseFushia.png"/>Équipement sportif</li>
+		<li class="ligneLegende"><img class="imgLegende" src="pictos/punaiseVert2.png"/>Art</li>
+		<li class="ligneLegende"><img class="imgLegende" src="pictos/punaiseVert.png"/>Statues</li>
+		<li class="ligneLegende"><img class="imgLegende" src="pictos/punaiseMoutarde.png"/>Service public</li>
+	</ul>
+</div>
 <div id="map_canvas"></div>
 <div id="mapCopyright"></div>
 <a href="http://www.valenciennes.fr/" target="blank"><img id="logo" src="logo.png"></a>
