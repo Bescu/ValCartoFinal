@@ -509,8 +509,8 @@ layers = {
 	// alignement vertical de la légende
 	
 	function legVerticalAlign(){
-		topPosition = window.innerHeight/2-105;
-		document.getElementById("legende").style.posTop=topPosition;
+		topPosition = (window.innerHeight/2-105).toString() + "px"
+		document.getElementById("legende").style.top=topPosition;
 	};
 	
 	legVerticalAlign();
