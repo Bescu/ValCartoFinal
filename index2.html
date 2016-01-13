@@ -501,7 +501,7 @@ layers = {
 					title: feature.getProperty('nom')||null, // défini le titre en fonction de son Libellé
 					icon: {url: layers[feature.getProperty('type')][1], size: layers[feature.getProperty('type')][7], scaledSize: pictoSize, anchor: pictoAnchor}, // défini l'icone de chaque couche en fonction de son genre
 					zIndex: layers[feature.getProperty('type')][4],
-					optimized: false
+					optimized: false // contournement du bug tooltips sous firefox : https://code.google.com/p/gmaps-api-issues/issues/detail?id=7136
 				};
 			});
 		};
