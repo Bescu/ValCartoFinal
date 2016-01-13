@@ -172,7 +172,7 @@ background-color: black;
 color: white;
 opacity: 0.8;
 position: absolute;
-right: 10px;
+right: 50px;
 top: 396.5px;
 z-index: 1;
 border-radius:16px;
@@ -500,7 +500,8 @@ layers = {
 				return {
 					title: feature.getProperty('nom')||null, // défini le titre en fonction de son Libellé
 					icon: {url: layers[feature.getProperty('type')][1], size: layers[feature.getProperty('type')][7], scaledSize: pictoSize, anchor: pictoAnchor}, // défini l'icone de chaque couche en fonction de son genre
-					zIndex: layers[feature.getProperty('type')][4]
+					zIndex: layers[feature.getProperty('type')][4],
+					optimized: false
 				};
 			});
 		};
